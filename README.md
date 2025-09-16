@@ -118,11 +118,24 @@ class Post extends Model
 Define which attributes should be embedded and where to store the vector data:
 
 ```php
-// In your Post model
+// In your Post model - Array of arrays format (recommended)
 protected $aiEmbeddable = [
-    'column' => 'content_embedding', // Database column for the vector
-    'source' => 'content',           // Source attribute to embed
+    [
+        'column' => 'content_embedding', // Database column for the vector
+        'source' => 'content',           // Source attribute to embed
+    ],
+    // You can add multiple embeddings:
+    // [
+    //     'column' => 'title_embedding',
+    //     'source' => 'title',
+    // ],
 ];
+
+// Alternative: Flat array format (backward compatible)
+// protected $aiEmbeddable = [
+//     'column' => 'content_embedding',
+//     'source' => 'content',
+// ];
 ```
 
 ### 3. Create Migration with Vector Column
@@ -401,7 +414,7 @@ The `HasAiFeatures` trait adds AI capabilities to your Eloquent models.
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `$aiEmbeddable` | `array` | Configuration for automatic embedding generation |
+| `$aiEmbeddable` | `array` | Configuration for automatic embedding generation (array of arrays or flat array) |
 | `$aiAppendable` | `array` | Configuration for on-the-fly attribute augmentation |
 | `$aiAppendableSource` | `string` | Source attribute for appendable features |
 
@@ -456,10 +469,6 @@ $content = AIFactory::generate('Write a blog post about Laravel');
 // Generate with specific service
 $content = AIFactory::service('anthropic')->generate('Write a product description');
 ```
-
-## Contributing
-
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## License
 

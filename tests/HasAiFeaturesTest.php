@@ -40,6 +40,28 @@ class HasAiFeaturesTest extends TestCase
         $this->assertTrue(property_exists($post, 'aiEmbeddable'));
         $this->assertIsArray($post->aiEmbeddable);
     }
+
+    public function test_backward_compatibility_with_flat_array()
+    {
+        $post = new TestPostFlatArray([
+            'title' => 'Test Post',
+            'content' => 'This is a test post content.',
+        ]);
+
+        $this->assertTrue(property_exists($post, 'aiEmbeddable'));
+        $this->assertIsArray($post->aiEmbeddable);
+        
+        // Test that the normalizeEmbeddableConfig method works with flat arrays
+        $reflection = new \ReflectionClass($post);
+        $method = $reflection->getMethod('normalizeEmbeddableConfig');
+        $method->setAccessible(true);
+        $normalized = $method->invoke($post);
+        
+        $this->assertIsArray($normalized);
+        $this->assertCount(1, $normalized);
+        $this->assertEquals('content_embedding', $normalized[0]['column']);
+        $this->assertEquals('content', $normalized[0]['source']);
+    }
 }
 
 class TestPost extends Model
@@ -49,6 +71,22 @@ class TestPost extends Model
     protected $table = 'test_posts';
     protected $fillable = ['title', 'content'];
 
+    protected $aiEmbeddable = [
+        [
+            'column' => 'content_embedding',
+            'source' => 'content',
+        ],
+    ];
+}
+
+class TestPostFlatArray extends Model
+{
+    use HasAiFeatures;
+
+    protected $table = 'test_posts';
+    protected $fillable = ['title', 'content'];
+
+    // Test backward compatibility with flat array format
     protected $aiEmbeddable = [
         'column' => 'content_embedding',
         'source' => 'content',

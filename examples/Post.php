@@ -16,11 +16,29 @@ class Post extends Model
 
     /**
      * Configure automatic embedding generation
+     * 
+     * Format 1: Array of arrays (recommended for multiple embeddings)
      */
     protected $aiEmbeddable = [
-        'column' => 'content_embedding', // Database column for the vector
-        'source' => 'content',          // Source attribute to embed
+        [
+            'column' => 'content_embedding', // Database column for the vector
+            'source' => 'content',          // Source attribute to embed
+        ],
+        // You can add more embeddings like this:
+        // [
+        //     'column' => 'title_embedding',
+        //     'source' => 'title',
+        // ],
     ];
+
+    /**
+     * Alternative format: Flat array (backward compatible)
+     * Uncomment this and comment out the above if you prefer the flat format
+     */
+    // protected $aiEmbeddable = [
+    //     'column' => 'content_embedding',
+    //     'source' => 'content',
+    // ];
 
     /**
      * Configure on-the-fly attribute augmentation
